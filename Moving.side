@@ -1,0 +1,14 @@
+Moving.c
+-I ./Learn/Simple Libraries/Robotics/ActivityBot360/libabdrive360
+-L ./Learn/Simple Libraries/Robotics/ActivityBot360/libabdrive360
+-I ./Learn/Simple Libraries/Utility/libsimpletools
+-L ./Learn/Simple Libraries/Utility/libsimpletools
+>compiler=C
+>memtype=cmm main ram compact
+>optimize=-Os
+>-m32bit-doubles
+>-fno-exceptions
+>defs::-std=c99
+>-lm
+>linker::-labdrive360 -lsimpletools
+>BOARD::ACTIVITYBOARD
