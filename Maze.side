@@ -1,0 +1,14 @@
+Maze.c
+-I ./../Learn/Simple Libraries/Robotics/ActivityBot360/libabdrive360
+-L ./../Learn/Simple Libraries/Robotics/ActivityBot360/libabdrive360
+-I ./../Learn/Simple Libraries/Sensor/libping
+-L ./../Learn/Simple Libraries/Sensor/libping
+>compiler=C
+>memtype=cmm main ram compact
+>optimize=-Os
+>-m32bit-doubles
+>-fno-exceptions
+>defs::-std=c99
+>-lm
+>linker::-labdrive360 -lping
+>BOARD::ACTIVITYBOARD
