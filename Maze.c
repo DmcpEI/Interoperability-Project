@@ -1,28 +1,31 @@
-/*
+/* Code from Sprint 2
+
 #include "abdrive360.h"
 #include "ping.h"
 
+int main() {
+  while (!input(0)) {
+    pause(10);
+  }
 
-int main()
-{
-  drive_speed(64, 64);  // set the initial speed of the robot
-  while(1) {
-    if (ping_cm(8) < 10) {  // check if there's an obstacle within 10 cm in front of the robot
-      drive_speed(0, 0);   // stop the robot
-      drive_goto(26, -25); // turn left
-      drive_speed(64, 64); // continue moving forward
-    } else if (ping_cm(10) < 10) { // check if there's an obstacle within 10 cm on the left side of the robot
-      drive_speed(0, 0);  // stop the robot
-      drive_goto(13, 13); // move forward a bit to get away from the wall
-      drive_goto(25, 26); // turn right
-      drive_speed(64, 64); // continue moving forward
-    } else if (ping_cm(2) < 10) { // check if there's an obstacle within 10 cm on the right side of the robot
-      drive_speed(0, 0);  // stop the robot
-      drive_goto(13, 13); // move forward a bit to get away from the wall
-      drive_goto(-25, -26); // turn left
-      drive_speed(64, 64); // continue moving forward
-    } else { // if there's no obstacle, just continue moving forward
+  drive_speed(64, 64);
+
+  while (1) {
+    if (ping_cm(8) > 10) { 
       drive_speed(64, 64);
+    } else {
+      drive_speed(0, 0);
+      drive_goto(-26, 26);
+      if (ping_cm(8) > 10) {
+        drive_speed(64, 64);
+      } else if (ping_cm(8) <= 10) {
+        drive_goto(-52, -52);
+        if (ping_cm(8) > 10) {
+          drive_speed(64, 64);
+        } else {
+          drive_goto(26, -26);
+        }
+      }
     }
   }
   return 0;
@@ -41,24 +44,70 @@ int main() {
   // Initialize the ActivityBot360
   drive_speed(64, 64); // Move forward at 64 speed
 
-  // Follow the maze using the ultrasonic sensor
+  // Main loop
   while (1) {
-    if (ping_cm(8) > 10) { // If there's no wall within 10 cm
-      drive_speed(64, 64); // Move forward at 64 speed
-    } else { // If there's a wall within 10 cm
-      drive_speed(0, 0); // Stop the robot
+    // Drive for 1 second
+    drive_speed(64, 64); // Move forward at 64 speed
+    pause(1000); // Wait for 1 second
+    drive_ramp(0, 0); // Stop the robot
+    pause(100); // Delay to ensure the robot has stopped
+
+    // Check surroundings
+    int frontDistance = ping_cm(8); // Distance in front
+
+    // Rotate to check the right side
+    drive_goto(-26, 26); // Turn right by 150 degrees
+    int rightDistance = ping_cm(8); // Distance on the right
+    drive_ramp(0, 0); // Stop the robot
+    pause(100); // Delay to ensure the robot has stopped
+
+    // Rotate to check the left side
+    drive_goto(52, -52); // Turn left by 300 degrees
+    int leftDistance = ping_cm(8); // Distance on the left
+    drive_ramp(0, 0); // Stop the robot
+    pause(100); // Delay to ensure the robot has stopped
+
+    // Rotate back to the original orientation
+    drive_goto(-26, 26); // Turn right by 150 degrees
+
+    // Debug output
+    print("Front distance: %d cm\n", frontDistance);
+    print("Right distance: %d cm\n", rightDistance);
+    print("Left distance: %d cm\n", leftDistance);
+
+    // Choose the best way to go based on the detected walls
+    if (frontDistance > 10) { // If no wall in front
+      // Go straight
+      print("Going straight\n");
+      drive_speed(64, 64);
+      pause(1000); // Drive for 1 second
+      drive_ramp(0, 0); // Stop the robot
+      pause(100); // Delay to ensure the robot has stopped
+    } else if (rightDistance > 10) { // If no wall on the right
+      // Turn right
+      print("Turning right\n");
       drive_goto(-26, 26); // Turn right by 150 degrees
-      if (ping_cm(8) > 10) { // If there's no wall on the right within 10 cm
-        drive_speed(64, 64); // Move forward at 64 speed
-      } else if (ping_cm(8) <= 10) { // If there's a wall on the right within 10 cm
-        drive_goto(-52, -52); // Turn around by 360 degrees
-        if (ping_cm(8) > 10) { // If there's no wall behind within 10 cm
-          drive_speed(64, 64); // Move forward at 64 speed
-        } else { // If there's a wall behind within 10 cm
-          drive_goto(26, -26); // Turn left by 150 degrees
-        }
-      }
+      drive_speed(64, 64);
+      pause(1000); // Drive for 1 second
+      drive_ramp(0, 0); // Stop the robot
+      pause(100); // Delay to ensure the robot has stopped
+    } else if (leftDistance > 10) { // If no wall on the left
+      // Turn left
+      print("Turning left\n");
+      drive_goto(26, -26); // Turn left by 150 degrees
+      drive_speed(64, 64);
+      pause(1000); // Drive for 1 second
+      drive_ramp(0, 0); // Stop the robot
+      pause(100); // Delay to ensure the robot has stopped
+    } else {
+      // Dead-end, turn around
+      print("Dead-end, turning around\n");
+      drive_goto(52, -52); // Turn around by 360 degrees
+      drive_speed(64, 64);
+      pause(1000); // Drive for 1 second
+      drive_ramp(0, 0); // Stop
     }
-  }
+  }    
   return 0;
-}
+}          
+
