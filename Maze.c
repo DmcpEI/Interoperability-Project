@@ -1,113 +1,111 @@
-/* Code from Sprint 2
-
-#include "abdrive360.h"
+#include "abdrive360.h" // Include the ActivityBot360 library
 #include "ping.h"
+#include <stdio.h>
+
+#define MAX_SIZE 12 // Tamanho máximo do labirinto (deve ser ímpar)
+
+void printMaze(char maze[][MAX_SIZE], int size) {
+  for (int i = 0; i < size; i++) {
+    for (int j = 0; j < size; j++) {
+      printf("%c ", maze[i][j]);
+    }
+    printf("\n");
+  }
+  printf("\n");
+}
 
 int main() {
-  while (!input(0)) {
-    pause(10);
-  }
+  int x = 0;
+  int y = 0;
+  int mazeSize = MAX_SIZE; // Tamanho do labirinto
+  char maze[MAX_SIZE][MAX_SIZE]; // Matriz para representar o labirinto
 
-  drive_speed(64, 64);
-
-  while (1) {
-    if (ping_cm(8) > 10) { 
-      drive_speed(64, 64);
-    } else {
-      drive_speed(0, 0);
-      drive_goto(-26, 26);
-      if (ping_cm(8) > 10) {
-        drive_speed(64, 64);
-      } else if (ping_cm(8) <= 10) {
-        drive_goto(-52, -52);
-        if (ping_cm(8) > 10) {
-          drive_speed(64, 64);
-        } else {
-          drive_goto(26, -26);
-        }
+  // Inicializar o labirinto com paredes
+  for (int i = 0; i < mazeSize; i++) {
+    for (int j = 0; j < mazeSize; j++) {
+      if (i == 0 || i == mazeSize - 1 || j == 0 || j == mazeSize - 1) {
+        maze[i][j] = '#'; // Bordas
+      } else {
+        maze[i][j] = ' '; // Espaços vazios dentro do labirinto
       }
     }
   }
-  return 0;
-}
-*/
-
-#include "abdrive360.h" // Include the ActivityBot360 library
-#include "ping.h"
-
-int main() {
-  // Wait for the RST button to be pressed
-  while (!input(0)) {
-    pause(10);
-  }
-
-  // Initialize the ActivityBot360
-  drive_speed(64, 64); // Move forward at 64 speed
 
   // Main loop
   while (1) {
-    // Drive for 1 second
-    drive_speed(64, 64); // Move forward at 64 speed
-    pause(1000); // Wait for 1 second
-    drive_ramp(0, 0); // Stop the robot
-    pause(100); // Delay to ensure the robot has stopped
+    // Atualizar a posição do robô no labirinto
+    maze[y + mazeSize/2][x + mazeSize/2] = '*';
 
     // Check surroundings
-    int frontDistance = ping_cm(8); // Distance in front
+    int frontDistance = ping_cm(8); // Distância à frente
 
     // Rotate to check the right side
-    drive_goto(-26, 26); // Turn right by 150 degrees
-    int rightDistance = ping_cm(8); // Distance on the right
-    drive_ramp(0, 0); // Stop the robot
-    pause(100); // Delay to ensure the robot has stopped
+    drive_goto(-26, 26); // Virar para a direita em 150 graus
+    int rightDistance = ping_cm(8); // Distância à direita
+    drive_ramp(0, 0); // Parar o robô
+    pause(100); // Atraso para garantir que o robô tenha parado
 
     // Rotate to check the left side
-    drive_goto(52, -52); // Turn left by 300 degrees
-    int leftDistance = ping_cm(8); // Distance on the left
-    drive_ramp(0, 0); // Stop the robot
-    pause(100); // Delay to ensure the robot has stopped
+    drive_goto(52, -52); // Virar para a esquerda em 300 graus
+    int leftDistance = ping_cm(8); // Distância à esquerda
+    drive_ramp(0, 0); // Parar o robô
+    pause(100); // Atraso para garantir que o robô tenha parado
 
     // Rotate back to the original orientation
-    drive_goto(-26, 26); // Turn right by 150 degrees
+    drive_goto(-26, 26); // Virar para a direita em 150 graus
 
     // Debug output
-    print("Front distance: %d cm\n", frontDistance);
-    print("Right distance: %d cm\n", rightDistance);
-    print("Left distance: %d cm\n", leftDistance);
+    printf("Front distance: %d cm\n", frontDistance);
+    printf("Right distance: %d cm\n", rightDistance);
+    printf("Left distance: %d cm\n", leftDistance);
+    printf("X: %d\n", x);
+    printf("Y: %d\n", y);
 
-    // Choose the best way to go based on the detected walls
-    if (frontDistance > 10) { // If no wall in front
+    // Verificar se o robô chegou ao final do labirinto
+    if (frontDistance > 20 && rightDistance > 20 && leftDistance > 20) {
+      printf("Labirinto concluído!\n");
+      break; // Sair do loop
+    }
+    // Escolher o melhor caminho com base nas paredes detectadas
+    else if (frontDistance > 10) { // Se não houver parede à frente
       // Go straight
-      print("Going straight\n");
+      printf("Going straight\n");
       drive_speed(64, 64);
-      pause(1000); // Drive for 1 second
-      drive_ramp(0, 0); // Stop the robot
-      pause(100); // Delay to ensure the robot has stopped
-    } else if (rightDistance > 10) { // If no wall on the right
+      pause(1000); // Dirigir por 1 segundo
+      drive_ramp(0, 0); // Parar o robô
+      pause(100); // Atraso para garantir que o robô tenha parado
+      y = y + 1;
+    } else if (rightDistance > 10) { // Se não houver parede à direita
       // Turn right
-      print("Turning right\n");
-      drive_goto(-26, 26); // Turn right by 150 degrees
+      printf("Turning right\n");
+      drive_goto(-26, 26); // Virar para a direita em 150 graus
       drive_speed(64, 64);
-      pause(1000); // Drive for 1 second
-      drive_ramp(0, 0); // Stop the robot
-      pause(100); // Delay to ensure the robot has stopped
-    } else if (leftDistance > 10) { // If no wall on the left
+      pause(1000); // Dirigir por 1 segundo
+      drive_ramp(0, 0); // Parar o robô
+      pause(100); // Atraso para garantir que o robô tenha parado
+      x = x + 1;
+    } else if (leftDistance > 10) { // Se não houver parede à esquerda
       // Turn left
-      print("Turning left\n");
-      drive_goto(26, -26); // Turn left by 150 degrees
+      printf("Turning left\n");
+      drive_goto(26, -26); // Virar para a esquerda em 150 graus
       drive_speed(64, 64);
-      pause(1000); // Drive for 1 second
-      drive_ramp(0, 0); // Stop the robot
-      pause(100); // Delay to ensure the robot has stopped
+      pause(1000); // Dirigir por 1 segundo
+      drive_ramp(0, 0); // Parar o robô
+      pause(100); // Atraso para garantir que o robô tenha parado
+      x = x - 1;
     } else {
       // Dead-end, turn around
-      print("Dead-end, turning around\n");
-      drive_goto(52, -52); // Turn around by 360 degrees
+      printf("Dead-end, turning around\n");
+      drive_goto(52, -52); // Virar 360 graus
       drive_speed(64, 64);
-      pause(1000); // Drive for 1 second
-      drive_ramp(0, 0); // Stop
+      pause(1000); // Dirigir por 1 segundo
+      drive_ramp(0, 0); // Parar
+      y = y - 1;
     }
-  }    
-  return 0;
-}          
+  }
 
+  // Imprimir o mapa do labirinto
+  printMaze(maze, mazeSize);
+
+  return 0;
+}
