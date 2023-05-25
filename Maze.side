@@ -7,6 +7,10 @@ Maze.c
 -L ./../../../../Documents/SimpleIDE/Learn/Simple Libraries/Robotics/ActivityBot360/libabdrive360
 -I ./../../../../Documents/SimpleIDE/Learn/Simple Libraries/Sensor/libping
 -L ./../../../../Documents/SimpleIDE/Learn/Simple Libraries/Sensor/libping
+-I ./../../Documents/SimpleIDE/SimpleIDE/Learn/Simple Libraries/Robotics/ActivityBot360/libabdrive360
+-L ./../../Documents/SimpleIDE/SimpleIDE/Learn/Simple Libraries/Robotics/ActivityBot360/libabdrive360
+-I ./../../Documents/SimpleIDE/SimpleIDE/Learn/Simple Libraries/Sensor/libping
+-L ./../../Documents/SimpleIDE/SimpleIDE/Learn/Simple Libraries/Sensor/libping
 >compiler=C
 >memtype=cmm main ram compact
 >optimize=-Os
